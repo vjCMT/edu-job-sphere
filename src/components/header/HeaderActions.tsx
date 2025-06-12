@@ -16,8 +16,7 @@ const HeaderActions = ({ user }: HeaderActionsProps) => {
 
   return (
     <div className="flex items-center gap-4">
-      <div className="hidden md:flex items-center gap-1">
-        <LanguageToggle />
+      <div className="hidden md:flex items-center gap-2">
         {user ? (
           <>
             <Button variant="ghost" size="icon" asChild>
@@ -48,7 +47,7 @@ const HeaderActions = ({ user }: HeaderActionsProps) => {
           to="/post-job"
           className="text-sm font-medium text-muted-foreground hover:text-primary"
         >
-          {t("header.employers")}
+          For Employers
         </Link>
       </div>
     </div>

@@ -17,6 +17,7 @@ import {
   Users,
   BarChart3,
   Monitor,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAppDispatch } from "@/app/hooks";
@@ -73,61 +74,91 @@ const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
     navigate('/');
   };
 
+  const getRoleDisplayName = () => {
+    switch (user.role) {
+      case 'employee':
+        return 'Teacher/Job Seeker';
+      case 'college':
+        return 'College/Institution';
+      case 'admin':
+        return 'Administrator';
+      default:
+        return user.role;
+    }
+  };
+
   return (
     <div className="relative">
       <Button
         variant="ghost"
-        size="icon"
+        size="sm"
         onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+        className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
       >
-        <User className="h-5 w-5 text-muted-foreground" />
+        <User className="h-4 w-4" />
+        <ChevronDown className="h-3 w-3" />
       </Button>
+      
       {isProfileMenuOpen && (
-        <div className="absolute right-0 mt-2 w-72 bg-background rounded-md shadow-lg z-50 border border-border overflow-hidden">
-          <div className="px-4 py-3 border-b border-border">
-            <p className="text-sm font-bold text-foreground truncate">
-              {user.email}
-            </p>
-            <p className="text-xs text-muted-foreground capitalize">
-              {user.role === 'employee' ? 'Teacher/Job Seeker' : 
-               user.role === 'college' ? 'College/Institution' : 
-               'Administrator'}
-            </p>
-          </div>
-          <div className="py-1">
-            {profileMenuItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors"
-                onClick={() => setIsProfileMenuOpen(false)}
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setIsProfileMenuOpen(false)}
+          />
+          
+          {/* Dropdown Menu */}
+          <div className="absolute right-0 mt-2 w-80 bg-background rounded-lg shadow-lg z-50 border border-border overflow-hidden">
+            {/* User Info Header */}
+            <div className="px-4 py-3 border-b border-border bg-muted/50">
+              <p className="text-sm font-semibold text-foreground truncate">
+                {user.email}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {getRoleDisplayName()}
+              </p>
+            </div>
+
+            {/* Menu Items */}
+            <div className="py-2">
+              {profileMenuItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
+                  onClick={() => setIsProfileMenuOpen(false)}
+                >
+                  <item.icon className="w-4 h-4 text-muted-foreground" />
+                  <span>{item.label}</span>
+                </Link>
+              ))}
+            </div>
+
+            {/* Footer */}
+            <div className="border-t border-border bg-muted/30">
+              <div className="px-4 py-2 text-xs text-muted-foreground">
+                © 2025 TeacherConnect -{" "}
+                <a href="#" className="underline hover:text-foreground">
+                  Terms
+                </a>{" "}
+                -{" "}
+                <a href="#" className="underline hover:text-foreground">
+                  Accessibility
+                </a>
+              </div>
+            </div>
+
+            {/* Sign Out Button */}
+            <div className="border-t border-border">
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
               >
-                <item.icon className="w-5 h-5 text-muted-foreground" />
-                <span>{item.label}</span>
-              </Link>
-            ))}
-          </div>
-          <div className="border-t border-border">
-            <div className="px-4 py-3 text-xs text-muted-foreground">
-              © 2025 TeacherConnect -{" "}
-              <a href="#" className="underline">
-                Terms
-              </a>{" "}
-              -{" "}
-              <a href="#" className="underline">
-                Accessibility
-              </a>
+                Sign out
+              </button>
             </div>
           </div>
-          <div className="border-t border-border">
-            <button
-              onClick={handleLogout}
-              className="w-full text-left px-4 py-3 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
-            >
-              {t("header.profile.signOut")}
-            </button>
-          </div>
-        </div>
+        </>
       )}
     </div>
   );
