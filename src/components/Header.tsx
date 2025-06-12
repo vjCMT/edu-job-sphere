@@ -18,7 +18,7 @@ const Header = () => {
           <div className="flex items-center gap-8">
             <Link to="/" className="flex-shrink-0">
               <span className="text-3xl font-bold text-primary">
-                {t("header.brandName")}
+                TeacherConnect
               </span>
             </Link>
             <NavigationMenu />

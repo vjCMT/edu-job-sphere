@@ -39,7 +39,7 @@ const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         return [
           { label: 'My Profile', path: '/dashboard/employee/profile', icon: User },
           { label: 'Skills & Experience', path: '/dashboard/employee/skills', icon: Star },
-          { label: 'Browse Jobs', path: '/dashboard/employee/browse-jobs', icon: Search },
+          { label: 'Browse Jobs', path: '/dashboard/employee/jobs', icon: Search },
           { label: 'My Applications', path: '/dashboard/employee/applications', icon: FileText },
           { label: 'Settings', path: '/dashboard/employee/settings', icon: SettingsIcon },
         ];
@@ -51,18 +51,29 @@ const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
           { label: 'Applications', path: '/dashboard/college/applications', icon: FileText },
           { label: 'Shortlist Candidates', path: '/dashboard/college/shortlist', icon: UserCheck },
           { label: 'Offer Letters', path: '/dashboard/college/offer-letter', icon: FileCheck },
-          { label: 'Settings', path: '/dashboard/college/settings', icon: SettingsIcon },
         ];
       case 'admin':
         return [
           { label: 'Manage Jobs', path: '/dashboard/admin/jobs', icon: Briefcase },
           { label: 'User Management', path: '/dashboard/admin/users', icon: Users },
-          { label: 'Workflows', path: '/dashboard/admin/workflows', icon: BarChart3 },
-          { label: 'Control Panel', path: '/dashboard/admin/control-panel', icon: Monitor },
-          { label: 'Settings', path: '/dashboard/admin/settings', icon: SettingsIcon },
+          { label: 'Workflows', path: '/dashboard/admin/workflow', icon: BarChart3 },
+          { label: 'Control Panel', path: '/dashboard/admin/control', icon: Monitor },
         ];
       default:
         return [];
+    }
+  };
+
+  const getDashboardPath = () => {
+    switch (user.role) {
+      case 'employee':
+        return '/dashboard/employee';
+      case 'college':
+        return '/dashboard/college';
+      case 'admin':
+        return '/dashboard/admin';
+      default:
+        return '/';
     }
   };
 
@@ -85,6 +96,11 @@ const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
       default:
         return user.role;
     }
+  };
+
+  const handleProfileClick = () => {
+    navigate(getDashboardPath());
+    setIsProfileMenuOpen(false);
   };
 
   return (
@@ -119,8 +135,19 @@ const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
               </p>
             </div>
 
-            {/* Menu Items */}
+            {/* Dashboard Link */}
             <div className="py-2">
+              <button
+                onClick={handleProfileClick}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors font-medium"
+              >
+                <User className="w-4 h-4 text-muted-foreground" />
+                <span>Go to Dashboard</span>
+              </button>
+            </div>
+
+            {/* Menu Items */}
+            <div className="py-2 border-t border-border">
               {profileMenuItems.map((item) => (
                 <Link
                   key={item.path}

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -37,22 +38,9 @@ const Login = () => {
         dispatch(setCredentials({ user: response.user }));
         toast.success('Logged in successfully!');
         
-        switch (response.user.role) {
-          case 'employer':
-            navigate('/my-profile');
-            break;
-          case 'college':
-            navigate('/college-profile');
-            break;
-          case 'admin':
-            navigate('/admin-profile');
-            break;
-          case 'employee':
-            navigate('/employee-profile');
-            break;
-          default:
-            navigate('/');
-        }
+        // Always redirect to home page after login
+        // Users can then navigate to their dashboard via profile icon
+        navigate('/');
       }
     } catch (err: any) {
       console.error('Login error:', err);

@@ -1,3 +1,4 @@
+
 // App.tsx
 import { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
@@ -15,6 +16,7 @@ import { useGetMeQuery } from './features/auth/authApiService';
 import {
   logOut,
   selectIsAuthenticated,
+  selectCurrentUser,
   setCredentials,
 } from './features/auth/authSlice';
 import i18n from './i18n/config';
@@ -41,9 +43,51 @@ import SalaryDetailsPage from './pages/SalaryDetailsPage';
 import SalaryGuide from './pages/SalaryGuide';
 import SettingsPage from './pages/SettingsPage/SettingsPage';
 
+// Dashboard Components
+import EmployeeDashboard from './pages/dashboard/EmployeeDashboard';
+import CollegeDashboard from './pages/dashboard/CollegeDashboard';
+import AdminDashboard from './pages/dashboard/AdminDashboard';
+
+// Employee Dashboard Pages
+import EmployeeProfile from './pages/dashboard/employee/Profile';
+import EmployeeSkills from './pages/dashboard/employee/Skills';
+import EmployeeJobs from './pages/dashboard/employee/Jobs';
+import EmployeeApply from './pages/dashboard/employee/Apply';
+import EmployeeApplications from './pages/dashboard/employee/Applications';
+import EmployeeSettings from './pages/dashboard/employee/Settings';
+
+// College Dashboard Pages
+import CollegePostJob from './pages/dashboard/college/PostJob';
+import CollegeProfile from './pages/dashboard/college/Profile';
+import CollegePosts from './pages/dashboard/college/Posts';
+import CollegeApplications from './pages/dashboard/college/Applications';
+import CollegeShortlist from './pages/dashboard/college/Shortlist';
+import CollegeOfferLetter from './pages/dashboard/college/OfferLetter';
+
+// Admin Dashboard Pages
+import AdminJobs from './pages/dashboard/admin/Jobs';
+import AdminUsers from './pages/dashboard/admin/Users';
+import AdminWorkflow from './pages/dashboard/admin/Workflow';
+import AdminControl from './pages/dashboard/admin/Control';
+
 const ProtectedRoute = () => {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+};
+
+const RoleProtectedRoute = ({ allowedRoles }: { allowedRoles: string[] }) => {
+  const user = useAppSelector(selectCurrentUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (!user || !allowedRoles.includes(user.role)) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return <Outlet />;
 };
 
 const AppContent = () => {
@@ -56,7 +100,6 @@ const AppContent = () => {
   useEffect(() => {
     if (isAuthenticated) {
       refetch().catch(() => {
-        // If refetch fails, log out the user
         dispatch(logOut());
       });
     }
@@ -70,7 +113,6 @@ const AppContent = () => {
     }
   }, [isSuccess, isError, data, dispatch]);
 
-  // Only show loading state if we're authenticated and loading
   if (isLoading && isAuthenticated) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -106,6 +148,43 @@ const AppContent = () => {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/post-job" element={<PostJob />} />
           <Route path="/products" element={<Products />} />
+        </Route>
+
+        {/* Employee Dashboard Routes */}
+        <Route element={<RoleProtectedRoute allowedRoles={['employee']} />}>
+          <Route path="/dashboard/employee" element={<EmployeeDashboard />}>
+            <Route index element={<Navigate to="/dashboard/employee/profile" replace />} />
+            <Route path="profile" element={<EmployeeProfile />} />
+            <Route path="skills" element={<EmployeeSkills />} />
+            <Route path="jobs" element={<EmployeeJobs />} />
+            <Route path="apply" element={<EmployeeApply />} />
+            <Route path="applications" element={<EmployeeApplications />} />
+            <Route path="settings" element={<EmployeeSettings />} />
+          </Route>
+        </Route>
+
+        {/* College Dashboard Routes */}
+        <Route element={<RoleProtectedRoute allowedRoles={['college']} />}>
+          <Route path="/dashboard/college" element={<CollegeDashboard />}>
+            <Route index element={<Navigate to="/dashboard/college/profile" replace />} />
+            <Route path="post-job" element={<CollegePostJob />} />
+            <Route path="profile" element={<CollegeProfile />} />
+            <Route path="posts" element={<CollegePosts />} />
+            <Route path="applications" element={<CollegeApplications />} />
+            <Route path="shortlist" element={<CollegeShortlist />} />
+            <Route path="offer-letter" element={<CollegeOfferLetter />} />
+          </Route>
+        </Route>
+
+        {/* Admin Dashboard Routes */}
+        <Route element={<RoleProtectedRoute allowedRoles={['admin']} />}>
+          <Route path="/dashboard/admin" element={<AdminDashboard />}>
+            <Route index element={<Navigate to="/dashboard/admin/jobs" replace />} />
+            <Route path="jobs" element={<AdminJobs />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="workflow" element={<AdminWorkflow />} />
+            <Route path="control" element={<AdminControl />} />
+          </Route>
         </Route>
 
         {/* 404 Page */}
