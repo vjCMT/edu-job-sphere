@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -12,6 +13,18 @@ import {
   Settings as SettingsIcon,
   HelpCircle,
   Lock,
+  Briefcase,
+  GraduationCap,
+  Users,
+  Shield,
+  PlusCircle,
+  Search,
+  ClipboardList,
+  UserCheck,
+  FileCheck,
+  BarChart3,
+  Gavel,
+  Monitor
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LanguageToggle from "./LanguageToggle";
@@ -34,22 +47,42 @@ const Header = () => {
     { label: t("header.nav.careerGuide"), path: "/career-guide" },
   ];
 
-  const profileMenuItems = [
-    { label: t("header.profile.profile"), path: "/profile", icon: FileText },
-    { label: t("header.profile.myJobs"), path: "/my-jobs", icon: Bookmark },
-    { label: t("header.profile.myReviews"), path: "/my-reviews", icon: Star },
-    {
-      label: t("header.profile.settings"),
-      path: "/settings",
-      icon: SettingsIcon,
-    },
-    { label: t("header.profile.help"), path: "/help", icon: HelpCircle },
-    {
-      label: t("header.profile.privacyCenter"),
-      path: "/privacy-centre",
-      icon: Lock,
-    },
-  ];
+  const getProfileMenuItems = () => {
+    if (!user) return [];
+
+    switch (user.role) {
+      case 'employee':
+        return [
+          { label: 'My Profile', path: '/dashboard/employee/profile', icon: User },
+          { label: 'Skills & Experience', path: '/dashboard/employee/skills', icon: Star },
+          { label: 'Browse Jobs', path: '/dashboard/employee/browse-jobs', icon: Search },
+          { label: 'My Applications', path: '/dashboard/employee/applications', icon: FileText },
+          { label: 'Settings', path: '/dashboard/employee/settings', icon: SettingsIcon },
+        ];
+      case 'college':
+        return [
+          { label: 'College Profile', path: '/dashboard/college/profile', icon: GraduationCap },
+          { label: 'Post New Job', path: '/dashboard/college/post-job', icon: PlusCircle },
+          { label: 'Manage Posts', path: '/dashboard/college/posts', icon: ClipboardList },
+          { label: 'Applications', path: '/dashboard/college/applications', icon: FileText },
+          { label: 'Shortlist Candidates', path: '/dashboard/college/shortlist', icon: UserCheck },
+          { label: 'Offer Letters', path: '/dashboard/college/offer-letter', icon: FileCheck },
+          { label: 'Settings', path: '/dashboard/college/settings', icon: SettingsIcon },
+        ];
+      case 'admin':
+        return [
+          { label: 'Manage Jobs', path: '/dashboard/admin/jobs', icon: Briefcase },
+          { label: 'User Management', path: '/dashboard/admin/users', icon: Users },
+          { label: 'Workflows', path: '/dashboard/admin/workflows', icon: BarChart3 },
+          { label: 'Control Panel', path: '/dashboard/admin/control-panel', icon: Monitor },
+          { label: 'Settings', path: '/dashboard/admin/settings', icon: SettingsIcon },
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const profileMenuItems = getProfileMenuItems();
 
   const handleLogout = () => {
     dispatch(logOut());
@@ -104,29 +137,23 @@ const Header = () => {
                       <User className="h-5 w-5 text-muted-foreground" />
                     </Button>
                     {isProfileMenuOpen && (
-                      <div className="absolute right-0 mt-2 w-64 bg-background rounded-md shadow-lg z-50 border border-border overflow-hidden">
-                        <div className="px-4 py-3">
+                      <div className="absolute right-0 mt-2 w-72 bg-background rounded-md shadow-lg z-50 border border-border overflow-hidden">
+                        <div className="px-4 py-3 border-b border-border">
                           <p className="text-sm font-bold text-foreground truncate">
                             {user.email}
                           </p>
                           <p className="text-xs text-muted-foreground capitalize">
-                            {user.role}
+                            {user.role === 'employee' ? 'Teacher/Job Seeker' : 
+                             user.role === 'college' ? 'College/Institution' : 
+                             'Administrator'}
                           </p>
                         </div>
                         <div className="py-1">
-                          <Link
-                            to="/profile"
-                            className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted"
-                            onClick={() => setIsProfileMenuOpen(false)}
-                          >
-                            <User className="w-5 h-5 text-muted-foreground" />
-                            <span>My Profile</span>
-                          </Link>
                           {profileMenuItems.map((item) => (
                             <Link
                               key={item.path}
                               to={item.path}
-                              className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted"
+                              className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors"
                               onClick={() => setIsProfileMenuOpen(false)}
                             >
                               <item.icon className="w-5 h-5 text-muted-foreground" />
@@ -149,7 +176,7 @@ const Header = () => {
                         <div className="border-t border-border">
                           <button
                             onClick={handleLogout}
-                            className="w-full text-left px-4 py-3 text-sm font-medium text-primary hover:bg-muted"
+                            className="w-full text-left px-4 py-3 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
                           >
                             {t("header.profile.signOut")}
                           </button>
@@ -242,13 +269,6 @@ const Header = () => {
                 <div className="px-3 py-2 text-sm text-muted-foreground">
                   Logged in as: {user.email} ({user.role})
                 </div>
-                <Link
-                  to="/profile"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  My Profile
-                </Link>
                 {profileMenuItems.map((item) => (
                   <Link
                     key={item.path}
@@ -261,7 +281,7 @@ const Header = () => {
                 ))}
                 <button
                   onClick={handleLogout}
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-primary hover:bg-muted"
+                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-destructive hover:bg-destructive/10"
                 >
                   {t("header.profile.signOut")}
                 </button>
