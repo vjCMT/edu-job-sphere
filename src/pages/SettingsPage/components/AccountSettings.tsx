@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { User } from '../../../features/auth/authSlice';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
@@ -196,7 +197,7 @@ const DeleteAccountModal = ({ onClose }: { onClose: () => void }) => {
     }
     try {
       await deleteAccount({ password }).unwrap();
-      await logoutUser({}).unwrap();
+      await logoutUser().unwrap();
       dispatch(logOut());
       toast.success('Account deleted successfully.');
       onClose();
